@@ -1,0 +1,66 @@
+# Flutter/Dart相关
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.lock
+
+# 环境变量文件
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# 密钥和配置文件
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.yaml
+secrets.yml
+config.yaml
+config.yml
+
+# IDE相关
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统相关
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+
+# iOS相关
+ios/Pods/
+ios/Runner.xcworkspace/xcshareddata/
+ios/Runner.xcworkspace/xcuserdata/
+
+# Android相关
+android/.gradle/
+android/local.properties
+android/app/debug/
+android/app/release/
+android/app/profile/
+
+# 测试覆盖率
+coverage/
+*.lcov

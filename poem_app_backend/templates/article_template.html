@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ article.title }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'SimSun', '宋体', serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .poem-container {
+            width: 800px;
+            height: 1200px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        
+        .poem-content {
+            padding: 60px 40px;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #8B4513;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            font-size: 48px;
+            color: #2F4F4F;
+            margin: 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .author {
+            font-size: 24px;
+            color: #696969;
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .poem-text {
+            font-size: 28px;
+            color: #2F4F4F;
+            line-height: 2;
+            margin: 0;
+            white-space: pre-line;
+            font-weight: 300;
+        }
+        
+        .footer {
+            text-align: center;
+            border-top: 2px solid #8B4513;
+            padding-top: 30px;
+            margin-top: 40px;
+        }
+        
+        .tags {
+            font-size: 18px;
+            color: #696969;
+            margin-bottom: 20px;
+        }
+        
+        .page-info {
+            font-size: 16px;
+            color: #8B4513;
+            font-weight: bold;
+        }
+        
+        .decorative-border {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid #8B4513;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+        
+        .corner-decoration {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid #8B4513;
+        }
+        
+        .corner-decoration.top-left {
+            top: 40px;
+            left: 40px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .corner-decoration.top-right {
+            top: 40px;
+            right: 40px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .corner-decoration.bottom-left {
+            bottom: 40px;
+            left: 40px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .corner-decoration.bottom-right {
+            bottom: 40px;
+            right: 40px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .poem-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="poem-container">
+        <div class="decorative-border"></div>
+        <div class="corner-decoration top-left"></div>
+        <div class="corner-decoration top-right"></div>
+        <div class="corner-decoration bottom-left"></div>
+        <div class="corner-decoration bottom-right"></div>
+        
+        <div class="poem-content">
+            <div class="header">
+                <h1 class="title">{{ article.title }}</h1>
+                {% if article.author %}
+                <div class="author">作者：{{ article.author }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="content">
+                <div class="poem-text">{{ article.content }}</div>
+            </div>
+            
+            <div class="footer">
+                {% if article.tags %}
+                <div class="tags">标签：{{ article.tags | join('，') }}</div>
+                {% endif %}
+                <div class="page-info">诗篇</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

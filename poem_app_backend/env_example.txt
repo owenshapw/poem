@@ -1,0 +1,30 @@
+# PoemVerse 项目环境变量配置示例
+# 复制此文件为 .env 并填入实际值
+
+# ===== 后端配置 =====
+# Flask配置
+SECRET_KEY=your-secret-key-here
+
+# Supabase配置
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-supabase-anon-key
+
+# 邮件配置
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+
+# Cloudflare Images配置
+CLOUDFLARE_ACCOUNT_ID=your-cloudflare-account-id
+CLOUDFLARE_API_TOKEN=your-cloudflare-api-token
+
+# AI图片生成配置（可选）
+STABILITY_API_KEY=your-stability-ai-api-key
+HF_API_KEY=your-huggingface-api-key
+
+# 应用配置
+FLASK_ENV=development
+FLASK_DEBUG=True
+
+# ===== 前端配置 =====
+# 后端API地址
+BACKEND_URL=http://localhost:5001 

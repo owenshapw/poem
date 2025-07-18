@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "798577867425",
+    "project_id": "poemverse-edb73",
+    "storage_bucket": "poemverse-edb73.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798577867425:android:e9375dd05b7a7c95e58ee0",
+        "android_client_info": {
+          "package_name": "com.example.poem_verse_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj1ZEafaiJ2W-z4ld5NxuMohoxcIP4AhA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
