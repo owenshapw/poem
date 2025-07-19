@@ -8,7 +8,6 @@ import 'package:poem_verse_app/models/article.dart';
 import 'package:poem_verse_app/screens/create_article_screen.dart';
 import 'package:poem_verse_app/screens/article_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:poem_verse_app/screens/my_artlist_screen.dart';
 
 class MyArticlesScreen extends StatefulWidget {
   const MyArticlesScreen({super.key});
@@ -21,7 +20,7 @@ class MyArticlesScreenState extends State<MyArticlesScreen> {
   Future<List<Article>>? _myArticlesFuture;
   final ScrollController _scrollController = ScrollController();
   int _lastViewedIndex = 0;  // 记录最后查看的文章索引
-  double _estimatedItemHeight = 300.0;  // 估计的每个文章卡片高度（包括间距）
+  final double _itemHeight = 370.0;  // 估计的每个文章卡片高度（包括间距）
 
   @override
   void initState() {
@@ -42,32 +41,23 @@ class MyArticlesScreenState extends State<MyArticlesScreen> {
       if (!mounted) return;
       
       if (_scrollController.hasClients) {
-        debugPrint('滚动到索引: $index');
         // 确保索引有效
         if (index < 0) {
-          debugPrint('无效索引: $index');
           return;
         }
         
         try {
-          // 使用最简单的方法：直接计算位置并跳转
-          // 这个值是通过实际测试得出的，可能需要根据实际情况调整
-          final double itemHeight = 370.0; // 调整后的卡片高度估计值
-          
+          // 使用类成员变量而不是局部变量，确保一致性
           // 计算目标位置，考虑顶部偏移
           final double topOffset = 0.0; // 不考虑顶部偏移
-          final double position = (index * itemHeight) - topOffset;
+          final double position = (index * _itemHeight) - topOffset;
           final double safePosition = position < 0 ? 0.0 : position;
-          
-          debugPrint('计算的滚动位置: $safePosition (索引: $index, 卡片高度: $itemHeight)');
           
           // 直接跳转到目标位置，不使用动画
           _scrollController.jumpTo(safePosition);
         } catch (e) {
-          debugPrint('滚动过程中出错: $e');
+          debugPrint('滚动到指定位置失败: $e');
         }
-      } else {
-        debugPrint('ScrollController没有客户端');
       }
     });
   }
@@ -111,18 +101,6 @@ class MyArticlesScreenState extends State<MyArticlesScreen> {
       backgroundColor: const Color(0xFFF8F6FF),
       appBar: AppBar(
         title: const Text('我的诗篇'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.swap_horiz),
-            tooltip: '切换到经典卡片列表',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const MyArtlistScreen()),
-              );
-            },
-          ),
-        ],
       ),
       body: SafeArea(
         child: Column(

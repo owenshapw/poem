@@ -6,7 +6,6 @@ import 'package:poem_verse_app/providers/article_provider.dart';
 import 'package:poem_verse_app/screens/home_screen.dart';
 import 'package:poem_verse_app/screens/reset_password_screen.dart';
 import 'package:poem_verse_app/screens/login_screen.dart';
-import 'package:poem_verse_app/screens/test_login_screen.dart';
 import 'package:poem_verse_app/screens/my_articles_screen.dart';
 import 'package:poem_verse_app/screens/article_detail_screen.dart';
 import 'package:poem_verse_app/api/api_service.dart';
@@ -87,9 +86,8 @@ class PoemVerseApp extends StatelessWidget {
             routes: {
               '/home': (context) => const HomeScreen(),
               '/login': (context) => const LoginScreen(),
-              '/test-login': (context) => const TestLoginScreen(),
               '/my-articles': (context) => const MyArticlesScreen(),
-              // '/migration' 路由和 MigrationScreen 相关内容已移除
+              // 已删除不需要的路由
             },
             onGenerateRoute: (settings) {
               if (settings.name != null) {

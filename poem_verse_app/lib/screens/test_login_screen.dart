@@ -66,25 +66,20 @@ class _TestLoginScreenState extends State<TestLoginScreen> {
   void _openMigrationPage() {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请先输入您的邮箱')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('请先输入您的邮箱')));
       return;
     }
 
     // 使用内置的迁移页面，而不是尝试打开浏览器
-    Navigator.of(context).pushNamed(
-      '/migration',
-      arguments: {'email': email},
-    );
+    Navigator.of(context).pushNamed('/migration', arguments: {'email': email});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('测试登录'),
-      ),
+      appBar: AppBar(title: const Text('测试登录')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -96,19 +91,13 @@ class _TestLoginScreenState extends State<TestLoginScreen> {
               children: [
                 const Text(
                   '临时测试登录',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   '使用硬编码密码"test123"登录',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -143,9 +132,7 @@ class _TestLoginScreenState extends State<TestLoginScreen> {
                         ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('测试登录'),
                   ),

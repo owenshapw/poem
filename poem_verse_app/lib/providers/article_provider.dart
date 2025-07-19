@@ -84,17 +84,34 @@ class ArticleProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final newArticle = await ApiService.createArticle(token, title, content, tags, author, previewImageUrl: previewImageUrl);
+    try {
+      // 检查token是否有效
+      if (token.isEmpty) {
+        throw Exception('认证令牌无效，请重新登录');
+      }
+      
+      developer.log('开始创建文章: $title', name: 'ArticleProvider');
+      final newArticle = await ApiService.createArticle(token, title, content, tags, author, previewImageUrl: previewImageUrl);
 
-    _isLoading = false;
-    if (newArticle != null) {
-      // Add the new article to the beginning of the list
-      _articles.insert(0, newArticle);
+      _isLoading = false;
+      
+      if (newArticle != null) {
+        // Add the new article to the beginning of the list
+        _articles.insert(0, newArticle);
+        developer.log('文章创建成功: ${newArticle.id}', name: 'ArticleProvider');
+        notifyListeners();
+        return true;
+      } else {
+        developer.log('文章创建失败: 返回null', name: 'ArticleProvider');
+        notifyListeners();
+        return false;
+      }
+    } catch (e, stackTrace) {
+      developer.log('文章创建异常: $e', name: 'ArticleProvider', error: e, stackTrace: stackTrace);
+      _isLoading = false;
+      _errorMessage = '创建文章失败: $e';
       notifyListeners();
-      return true;
-    } else {
-      notifyListeners();
-      return false;
+      rethrow; // 重新抛出异常，让UI层处理
     }
   }
 
@@ -110,13 +127,39 @@ class ArticleProvider with ChangeNotifier {
   }
 
   Future<String?> generatePreview(String token, String title, String content, List<String> tags, String author) async {
-    final response = await ApiService.generatePreview(token, title, content, tags, author);
-    
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      return data['preview_url'];
-    } else {
-      return null;
+    try {
+      // 检查token是否有效
+      if (token.isEmpty) {
+        throw Exception('认证令牌无效，请重新登录');
+      }
+      
+      developer.log('开始生成预览: $title', name: 'ArticleProvider');
+      final response = await ApiService.generatePreview(token, title, content, tags, author);
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final previewUrl = data['preview_url'];
+        developer.log('预览生成成功: $previewUrl', name: 'ArticleProvider');
+        return previewUrl;
+      } else {
+        // 尝试解析错误信息
+        String errorMessage = '生成预览失败: 状态码 ${response.statusCode}';
+        try {
+          final errorData = json.decode(response.body);
+          if (errorData['error'] != null) {
+            errorMessage = errorData['error'];
+          }
+        } catch (e) {
+          // 解析错误信息失败，使用默认错误信息
+        }
+        developer.log('预览生成失败: $errorMessage', name: 'ArticleProvider');
+        throw Exception(errorMessage);
+      }
+    } catch (e, stackTrace) {
+      developer.log('预览生成异常: $e', name: 'ArticleProvider', error: e, stackTrace: stackTrace);
+      _errorMessage = '生成预览失败: $e';
+      notifyListeners();
+      return null; // 返回null，让UI层处理
     }
   }
 
