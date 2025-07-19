@@ -81,8 +81,15 @@ class _PoemMagazineScreenState extends State<PoemMagazineScreen> {
                           builder: (context, child) {
                             double value = 1.0;
                             if (_pageController.position.haveDimensions) {
-                              value = ((_pageController.page ?? _pageController.initialPage).toDouble()) - index.toDouble();
-                              value = (1 - (value.abs() * 0.3)).clamp(0.7, 1.0);
+                              final currentPage = _pageController.page ?? _pageController.initialPage.toDouble();
+                              if (currentPage.isFinite) {
+                                value = currentPage - index.toDouble();
+                                value = (1 - (value.abs() * 0.3)).clamp(0.7, 1.0);
+                                // 确保value是有效的数值
+                                if (!value.isFinite) {
+                                  value = 1.0;
+                                }
+                              }
                             }
                             return Opacity(
                               opacity: value,

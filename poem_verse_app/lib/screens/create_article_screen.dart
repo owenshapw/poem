@@ -291,6 +291,19 @@ class CreateArticleScreenState extends State<CreateArticleScreen> {
                   child: NetworkImageWithDio(
                     imageUrl: _buildImageUrl(_previewImageUrl!),
                     fit: BoxFit.cover,
+                    placeholder: Container(color: Colors.white),
+                    errorWidget: Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+                            Text('图片加载失败'),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

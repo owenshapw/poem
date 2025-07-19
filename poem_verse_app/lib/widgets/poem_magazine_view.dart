@@ -156,7 +156,13 @@ class _ExpandableTextState extends State<ExpandableText> {
       text: span,
       maxLines: widget.maxLines,
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: MediaQuery.of(context).size.width - 48); // 24+24 padding
+    );
+    
+    // 安全地获取屏幕宽度，避免NaN值
+    final screenWidth = MediaQuery.of(context).size.width;
+    final safeWidth = (screenWidth.isFinite && screenWidth > 48) ? screenWidth - 48 : 300.0;
+    
+    tp.layout(maxWidth: safeWidth); // 24+24 padding
     setState(() {
       _exceedsMaxLines = tp.didExceedMaxLines;
     });

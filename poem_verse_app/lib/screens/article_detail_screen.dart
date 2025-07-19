@@ -35,6 +35,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
 
   @override
   void dispose() {
+    // 只释放资源，不返回数据（由WillPopScope处理）
     _pageController.dispose();
     super.dispose();
   }
@@ -184,8 +185,21 @@ ${_article.tags.isNotEmpty ? '标签：${_article.tags.join('、')}' : ''}
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        // 在用户点击返回按钮或使用手势返回时，返回最后查看的文章ID
+        final Map<String, dynamic> result = {
+          'articleId': _article.id, 
+          'changed': _isDeleting,
+          'lastViewedArticleId': _article.id,
+        };
+        
+        debugPrint('用户返回，传递数据: $result');
+        Navigator.of(context).pop(result);
+        return false; // 返回false，因为我们已经手动处理了返回操作
+      },
+      child: Scaffold(
+        appBar: AppBar(
         title: const Text('诗篇详情'),
         actions: [
           if (_isAuthor(context)) ...[
@@ -210,9 +224,11 @@ ${_article.tags.isNotEmpty ? '标签：${_article.tags.join('、')}' : ''}
       body: PageView.builder(
         controller: _pageController,
         itemCount: widget.articles.length,
+        physics: const BouncingScrollPhysics(),
         onPageChanged: (index) {
           setState(() {
             _article = widget.articles[index];
+            debugPrint('页面切换到索引: $index, 文章ID: ${_article.id}, 标题: ${_article.title}');
           });
         },
         itemBuilder: (context, index) {
@@ -228,19 +244,7 @@ ${_article.tags.isNotEmpty ? '标签：${_article.tags.join('、')}' : ''}
                     child: NetworkImageWithDio(
                       imageUrl: ApiService.buildImageUrl(article.imageUrl),
                       fit: BoxFit.cover,
-                      placeholder: Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(),
-                              SizedBox(height: 16),
-                              Text('加载中...'),
-                            ],
-                          ),
-                        ),
-                      ),
+                      placeholder: Container(color: Colors.white),
                       errorWidget: Container(
                         color: Colors.grey[200],
                         child: const Center(
@@ -363,6 +367,7 @@ ${_article.tags.isNotEmpty ? '标签：${_article.tags.join('、')}' : ''}
             ),
           );
         },
+      ),
       ),
     );
   }

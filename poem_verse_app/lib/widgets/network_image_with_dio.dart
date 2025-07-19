@@ -113,7 +113,9 @@ class NetworkImageWithDioState extends State<NetworkImageWithDio> {
 
   @override
   Widget build(BuildContext context) {
-    double? safeDouble(double? v) => (v == null || v.isNaN) ? null : v;
+    double? safeDouble(double? v) => (v == null || v.isNaN || v.isInfinite) ? null : v;
+    double safeProgress(double progress) => progress.isNaN || progress.isInfinite ? 0.0 : progress.clamp(0.0, 1.0);
+    
     // 如果启用了回退方案且Dio失败，使用Flutter内置的Image.network
     if (_useFallback && widget.useFallback) {
       return Image.network(
@@ -124,19 +126,24 @@ class NetworkImageWithDioState extends State<NetworkImageWithDio> {
         headers: widget.headers,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
+          
+          double? progressValue;
+          if (loadingProgress.expectedTotalBytes != null && 
+              loadingProgress.expectedTotalBytes! > 0) {
+            final rawProgress = loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!;
+            progressValue = safeProgress(rawProgress);
+          }
+          
           return Container(
-            width: widget.width,
-            height: widget.height,
+            width: safeDouble(widget.width),
+            height: safeDouble(widget.height),
             color: Colors.grey[200],
             child: widget.placeholder ?? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null && 
-                           loadingProgress.expectedTotalBytes! > 0
-                        ? (loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!).clamp(0.0, 1.0)
-                        : null,
+                    value: progressValue,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -187,8 +194,8 @@ class NetworkImageWithDioState extends State<NetworkImageWithDio> {
         
         // 加载成功
         if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
-          return Image.memory(
-            snapshot.data!,
+          return _FadeInImageMemory(
+            imageBytes: snapshot.data!,
             width: safeDouble(widget.width),
             height: safeDouble(widget.height),
             fit: widget.fit,
@@ -205,9 +212,11 @@ class NetworkImageWithDioState extends State<NetworkImageWithDio> {
   }
 
   Widget _buildErrorWidget() {
+    double? safeDouble(double? v) => (v == null || v.isNaN || v.isInfinite) ? null : v;
+    
     return Container(
-      width: widget.width,
-      height: widget.height,
+      width: safeDouble(widget.width),
+      height: safeDouble(widget.height),
       color: Colors.grey[200],
       child: widget.errorWidget ?? Center(
         child: Column(
@@ -229,6 +238,58 @@ class NetworkImageWithDioState extends State<NetworkImageWithDio> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _FadeInImageMemory extends StatefulWidget {
+  final Uint8List imageBytes;
+  final double? width;
+  final double? height;
+  final BoxFit? fit;
+  final ImageErrorWidgetBuilder? errorBuilder;
+
+  const _FadeInImageMemory({
+    required this.imageBytes,
+    this.width,
+    this.height,
+    this.fit,
+    this.errorBuilder,
+  });
+
+  @override
+  State<_FadeInImageMemory> createState() => _FadeInImageMemoryState();
+}
+
+class _FadeInImageMemoryState extends State<_FadeInImageMemory> with SingleTickerProviderStateMixin {
+  double _opacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // 即使图片已缓存，也强制短暂延迟后淡入
+    Future.delayed(const Duration(milliseconds: 80), () {
+      if (mounted) {
+        setState(() {
+          _opacity = 1.0;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: _opacity,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.ease,
+      child: Image.memory(
+        widget.imageBytes,
+        width: widget.width,
+        height: widget.height,
+        fit: widget.fit,
+        errorBuilder: widget.errorBuilder,
       ),
     );
   }

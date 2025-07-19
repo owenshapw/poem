@@ -7,11 +7,10 @@ import 'package:poem_verse_app/models/article.dart';
 import 'package:provider/provider.dart';
 import 'package:poem_verse_app/providers/article_provider.dart';
 import 'package:poem_verse_app/screens/article_detail_screen.dart';
-import 'dart:ui';
-import 'package:flutter/services.dart';
 import 'package:poem_verse_app/screens/login_screen.dart';
 import 'package:poem_verse_app/widgets/simple_network_image.dart';
 import 'package:poem_verse_app/screens/poem_magazine_screen.dart';
+import 'package:poem_verse_app/screens/my_artlist_waterfall_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,11 +25,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // 使用Future.microtask延迟执行，避免在构建过程中调用setState
     Future.microtask(() {
       if (mounted) {
-        final articleProvider = Provider.of<ArticleProvider>(context, listen: false);
+        final articleProvider = Provider.of<ArticleProvider>(
+          context,
+          listen: false,
+        );
         articleProvider.fetchArticles();
       }
     });
@@ -39,7 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         if (mounted) {
-          final articleProvider = Provider.of<ArticleProvider>(context, listen: false);
+          final articleProvider = Provider.of<ArticleProvider>(
+            context,
+            listen: false,
+          );
           articleProvider.fetchMoreArticles();
         }
       }
@@ -54,128 +59,54 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF232946),
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
-    );
     return Scaffold(
-      backgroundColor: const Color(0xFF232946),
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF667eea),
-                  Color(0xFF764ba2),
-                ],
-              ),
+      appBar: AppBar(
+        title: const Text('首页'),
+        actions: [
+          IconButton(
+            icon: const CircleAvatar(
+              // 使用图标代替缺失的图片资源
+              child: Icon(Icons.person, size: 18, color: Colors.white),
+              radius: 14,
+              backgroundColor: Colors.purple,
             ),
-          ),
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: Container(
-              color: Colors.white.withOpacity(0.05),
-            ),
-          ),
-          SafeArea(
-            child: Consumer<ArticleProvider>(
-              builder: (context, articleProvider, child) {
-                if (articleProvider.isLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).primaryColor),
-                    ),
-                  );
-                }
-
-                if (articleProvider.errorMessage != null) {
-                  return Center(
-                    child: Text(
-                      articleProvider.errorMessage!,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  );
-                }
-
-                if (articleProvider.articles.isEmpty && articleProvider.topArticle == null) {
-                  return const Center(
-                    child: Text(
-                      'No articles found.',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.only(top: 48),
-                  itemCount: articleProvider.articles.length +
-                      (articleProvider.topArticle != null ? 1 : 0) +
-                      (articleProvider.isLoadingMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (articleProvider.topArticle != null) {
-                      if (index == 0) {
-                        return _buildTopArticleCard(
-                            context, articleProvider.topArticle!);
-                      }
-                      index -= 1;
-                    }
-
-                    if (index == articleProvider.articles.length) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-                    final article = articleProvider.articles[index];
-                    return _buildWeekCard(
-                        context, article, index, articleProvider.articles);
-                  },
-                );
-              },
-            ),
-          ),
-          Positioned(
-            top: 56,
-            right: 16,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.menu_book, color: Colors.white, size: 28),
-                  tooltip: '杂志风格Demo',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PoemMagazineScreen()),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.person_outline, color: Colors.white, size: 28),
-                  tooltip: '登录',
-                  onPressed: () {
-                    if (mounted) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
+            tooltip: '登录',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            },
           ),
         ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PoemMagazineScreen()),
+                );
+              },
+              child: const Text('Poem Magazine 杂志风格'),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MyArtlistWaterfallScreen(),
+                  ),
+                );
+              },
+              child: const Text('极致平滑瀑布流卡片列表'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,21 +122,21 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ArticleDetailScreen(
-                articles: [article],
-                initialIndex: 0,
-              ),
+              builder: (_) =>
+                  ArticleDetailScreen(articles: [article], initialIndex: 0),
             ),
           ).then((_) {
             if (!mounted) return;
-            Provider.of<ArticleProvider>(context, listen: false)
-                .fetchArticles();
+            Provider.of<ArticleProvider>(
+              context,
+              listen: false,
+            ).fetchArticles();
           });
         } catch (e) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('打开文章失败: $e')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('打开文章失败: $e')));
           }
         }
       },
@@ -228,8 +159,10 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Positioned.fill(
                 child: SimpleNetworkImage(
-                  imageUrl:
-                      ApiService.getImageUrlWithVariant(article.imageUrl, 'public'),
+                  imageUrl: ApiService.getImageUrlWithVariant(
+                    article.imageUrl,
+                    'public',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -296,33 +229,37 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildWeekCard(BuildContext context, Article article, int index,
-      List<Article> articles) {
+  Widget _buildWeekCard(
+    BuildContext context,
+    Article article,
+    int index,
+    List<Article> articles,
+  ) {
     String content = article.content;
     List<String> lines = content.split('\n');
     String previewText = lines.take(3).join('\n');
-    
+
     return GestureDetector(
       onTap: () {
         try {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ArticleDetailScreen(
-                articles: articles,
-                initialIndex: index,
-              ),
+              builder: (_) =>
+                  ArticleDetailScreen(articles: articles, initialIndex: index),
             ),
           ).then((_) {
             if (!mounted) return;
-            Provider.of<ArticleProvider>(context, listen: false)
-                .fetchArticles();
+            Provider.of<ArticleProvider>(
+              context,
+              listen: false,
+            ).fetchArticles();
           });
         } catch (e) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('打开文章失败: $e')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('打开文章失败: $e')));
           }
         }
       },
@@ -338,10 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(
-            color: Colors.white.withOpacity(0.18),
-            width: 1,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.18), width: 1),
         ),
         child: ListTile(
           contentPadding: const EdgeInsets.all(14),
@@ -360,8 +294,10 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(12),
               child: article.imageUrl.isNotEmpty
                   ? SimpleNetworkImage(
-                      imageUrl:
-                          ApiService.getImageUrlWithVariant(article.imageUrl, 'list'),
+                      imageUrl: ApiService.getImageUrlWithVariant(
+                        article.imageUrl,
+                        'list',
+                      ),
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
@@ -369,23 +305,32 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 56,
                         height: 56,
                         color: Colors.white.withOpacity(0.1),
-                        child: Icon(Icons.image_outlined,
-                            color: Colors.white.withOpacity(0.3), size: 28),
+                        child: Icon(
+                          Icons.image_outlined,
+                          color: Colors.white.withOpacity(0.3),
+                          size: 28,
+                        ),
                       ),
                       errorWidget: Container(
                         width: 56,
                         height: 56,
                         color: Colors.white.withOpacity(0.1),
-                        child: Icon(Icons.broken_image_outlined,
-                            color: Colors.white.withOpacity(0.3), size: 28),
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          color: Colors.white.withOpacity(0.3),
+                          size: 28,
+                        ),
                       ),
                     )
                   : Container(
                       width: 56,
                       height: 56,
                       color: Colors.white.withOpacity(0.1),
-                      child: Icon(Icons.image_outlined,
-                          color: Colors.white.withOpacity(0.3), size: 28),
+                      child: Icon(
+                        Icons.image_outlined,
+                        color: Colors.white.withOpacity(0.3),
+                        size: 28,
+                      ),
                     ),
             ),
           ),
